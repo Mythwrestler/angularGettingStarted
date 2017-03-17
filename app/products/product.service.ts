@@ -9,21 +9,27 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class ProductService {
+    errorMessage: any;
 
     private _productURL = 'api/products/products.json';
 
-    constructor(private _http: Http){}
+    constructor(private _http: Http) { }
 
-    getProducts(): Observable<IProduct[]>{
+    getProducts(): Observable<IProduct[]> {
         return this._http.get(this._productURL)
-            .map((response:Response) => <IProduct[]>response.json())
+            .map((response: Response) => <IProduct[]>response.json())
             .do(data => console.log('All: ' + JSON.stringify(data)))
             .catch(this.handleError);
     }
 
-    private handleError(error: Response){
+    getProduct(id: Number): Observable<IProduct> {
+        return this.getProducts()
+        .map((products:IProduct[]) => products.find(p => p.productId === id));
+    }
+
+    private handleError(error: Response) {
         console.error(error);
-        return Observable.throw(error.json || 'Server Error');
+        return Observable.throw(error.json().error || 'Server Error');
     }
 
 
